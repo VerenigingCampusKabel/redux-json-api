@@ -7,13 +7,21 @@ import {createApi} from 'rdx-api';
  * @return {object} API definition
  */
 export const createJsonApi = (config) => {
+    const entries = Object.entries(config.entities);
+
     // Normalize entities
-    const entities = Object.entries(config.entities).reduce((final, [entityName, entityUrl]) => {
+    const entities = entries.reduce((final, [entityName, entity]) => {
         final[entityName] = {
             name: entityName,
-            urlPrefix: entityUrl.startsWith('/') ? entityUrl : `/${entityUrl}`,
+            urlPrefix: entity.url.startsWith('/') ? entity.url : `/${entity.url}`,
             urlPostfix: ''
         };
+        return final;
+    }, {});
+
+    // Create entity type lookup map
+    const typeToEntity = entries.reduce((final, [entityName, entity]) => {
+        final[entity.type] = entityName;
         return final;
     }, {});
 
@@ -35,7 +43,7 @@ export const createJsonApi = (config) => {
     }
 
     // Create the API using redux-api
-    return createApi({
+    const api = createApi({
         ...config,
         options: {
             stripTrailingSlash: true,
@@ -90,4 +98,9 @@ export const createJsonApi = (config) => {
             ...config.entityEndpoints
         }
     });
+
+    // Store entity type lookup map
+    api.typeToEntity = typeToEntity;
+
+    return api;
 };

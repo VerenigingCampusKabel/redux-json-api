@@ -8,7 +8,13 @@ export default createJsonApi({
         credentials: 'include'
     },
     entities: {
-        users: '/users',
-        posts: '/posts'
+        users: {
+            type: 'user',
+            url: '/users'
+        },
+        posts: {
+            type: 'post',
+            url: '/posts'
+        }
     }
 });
