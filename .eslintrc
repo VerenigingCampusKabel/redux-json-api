@@ -35,6 +35,7 @@
         "no-unused-vars": 1,
         "no-extra-semi": 0,
         "prefer-const": 1,
+        "dot-notation": 0,
 
         "babel/generator-star-spacing": 1,
         "babel/new-cap": 0,

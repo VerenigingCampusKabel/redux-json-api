@@ -34,10 +34,11 @@
     "build:babel2": "cross-env NODE_ENV=production babel lib --out-dir lib",
     "build": "yarn run clean && yarn run build:babel && yarn run build:babel2",
     "prepublish": "yarn run build",
-    "test": "babel-node example/test.js"
+    "test": "babel-node example/index.js"
   },
   "dependencies": {
-    "babel-runtime": "^6.9.2"
+    "babel-runtime": "^6.9.2",
+    "rdx-api": "^2.0.5"
   },
   "devDependencies": {
     "babel-cli": "^6.7.5",
