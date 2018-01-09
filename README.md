@@ -1,5 +1,7 @@
 # redux-json-api
 
+[![rdx-json-api](https://img.shields.io/npm/v/rdx-json-api.svg)](https://www.npmjs.com/package/rdx-json-api)
+
 Redux middleware for calling and [JSON API](http://jsonapi.org).
 
 ## Installation
