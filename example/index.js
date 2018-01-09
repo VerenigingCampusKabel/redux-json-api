@@ -1,3 +1,4 @@
-import api from './api';
+import {users} from './actions';
+import store from './store';
 
-console.log(api);
+store.dispatch(users.getAll({}));
