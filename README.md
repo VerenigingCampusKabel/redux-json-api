@@ -1,4 +1,4 @@
-# redux-api
+# redux-json-api
 
 Redux middleware for calling and [JSON API](http://jsonapi.org).
 
@@ -6,6 +6,9 @@ Redux middleware for calling and [JSON API](http://jsonapi.org).
 ```
 $ yarn add rdx-json-api
 ```
+
+## Dependencies
+- [redux-api](https://github.com/VerenigingCampusKabel/redux-api)
 
 ## Usage
 *Work in progress*
