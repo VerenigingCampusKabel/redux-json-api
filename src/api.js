@@ -1,7 +1,7 @@
 import {createApi} from 'rdx-api';
 
 /**
- * Define an API
+ * Define a JSON API.
  *
  * @param {object} config API configuration
  * @return {object} API definition
