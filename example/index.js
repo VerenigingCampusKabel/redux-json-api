@@ -1,4 +1,10 @@
-import {users} from './actions';
+import {authors} from './actions';
 import store from './store';
 
-store.dispatch(users.getAll({}));
+(async () => {
+    await store.dispatch(authors.getAll({}));
+    await store.dispatch(authors.getRelationship({
+        id: '1',
+        relationship: 'books'
+    }));
+})();

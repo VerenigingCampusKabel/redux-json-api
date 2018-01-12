@@ -7,8 +7,8 @@ const actions = createApiActions(api);
 
 const {
     entities: {
-        users,
-        posts
+        authors,
+        books
     },
     endpoints,
     resetEndpoint
@@ -18,6 +18,6 @@ const {
 export {
     endpoints as api,
     resetEndpoint as apiResetEndpoint,
-    users,
-    posts
+    authors,
+    books
 };

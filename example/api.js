@@ -8,13 +8,13 @@ export default createJsonApi({
         credentials: 'include'
     },
     entities: {
-        users: {
-            type: 'user',
-            url: '/users'
+        authors: {
+            type: 'authors',
+            url: '/authors'
         },
-        posts: {
-            type: 'post',
-            url: '/posts'
+        books: {
+            type: 'books',
+            url: '/books'
         }
     }
 });
