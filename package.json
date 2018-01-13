@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.9.2",
-    "rdx-api": "^2.0.5"
+    "rdx-api": "^2.0.6"
   },
   "devDependencies": {
     "babel-cli": "^6.7.5",

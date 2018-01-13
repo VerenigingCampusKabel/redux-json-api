@@ -23,24 +23,30 @@ export const parseEntity = (options, entity) => {
     return fromJS(entity);
 };
 
-export const parseEntities = (api, options, currentState, data) => {
-    if (Array.isArray(data)) {
-        if (data.length > 0) {
-            // Loop over all entities
-            return data.reduce((state, entityData) => {
-                // Parse the entity and put it in the entity map
-                const entity = parseEntity(options, entityData);
-                const type = api.typeToEntity[entity.get('type')];
+export const _parseEntities = (api, options, currentState, data, key = null) => {
+    if (data.length > 0) {
+        // Loop over all entities
+        return data.reduce((state, entityData) => {
+            // Parse the entity and put it in the entity map
+            const entity = parseEntity(options, entityData);
+            const type = api.typeToEntity[entity.get('type')];
 
-                return state.setIn([type, 'entities', entity.get('id')], entity);
-            }, currentState);
-        }
-        return currentState;
+            let newState = state.setIn([type, 'entities', entity.get('id')], entity);
+            if (key) {
+                newState = newState.updateIn([...key, 'result'], (result) => result.push(entity.get('id')));
+                if (!newState.getIn([...key, 'resultType'])) {
+                    newState = newState.setIn([...key, 'resultType'], entity.get('type'));
+                }
+            }
+            return newState;
+        }, currentState);
     }
+    return currentState;
+};
 
-    // Parse the entity and update state
-    const entity = parseEntity(options, data);
-    const type = api.typeToEntity[entity.get('type')];
-
-    return currentState.setIn([type, 'entities', entity.get('id')], entity);
+export const parseEntities = (api, options, currentState, data, key = null) => {
+    if (Array.isArray(data)) {
+        return _parseEntities(api, options, currentState, data, key);
+    }
+    return _parseEntities(api, options, currentState, [data], key);
 };

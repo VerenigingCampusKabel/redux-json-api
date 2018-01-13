@@ -1,5 +1,5 @@
 import util from 'util';
-import {Map} from 'immutable';
+import {List, Map} from 'immutable';
 import {API_SIGNATURE, InvalidConfigError} from 'rdx-api';
 
 import {parseEntities} from './entity';
@@ -11,7 +11,7 @@ import {parseEntities} from './entity';
  * @param {object} options Reducer options
  * @return {function} The created Redux reducer
  */
-export const createJsonApiReducer = (api, {onPayloadError}) => {
+export const createJsonApiReducer = (api, options) => {
     // Validate API configuration
     if (typeof api !== 'object') {
         throw new InvalidConfigError(`Invalid API configuration: ${api}`);
@@ -34,7 +34,7 @@ export const createJsonApiReducer = (api, {onPayloadError}) => {
 
     // Return the reducer
     return (state = initialState, action) => {
-        console.log('reducer', util.inspect(action, true, null));
+        // console.log('reducer', util.inspect(action, true, null));
         if (action.isError) {
             console.error('error', action.error);
         }
@@ -46,8 +46,8 @@ export const createJsonApiReducer = (api, {onPayloadError}) => {
 
         // Check for payload errors
         if (action.hasPayloadError) {
-            if (onPayloadError) {
-                onPayloadError(state, action);
+            if (options.onPayloadError) {
+                options.onPayloadError(state, action);
             }
             return state;
         }
@@ -57,7 +57,6 @@ export const createJsonApiReducer = (api, {onPayloadError}) => {
             case 'getSingle':
             case 'getRelationship': {
                 const requestKey = JSON.stringify(action.requestPayload || {});
-                console.log('KEY:', requestKey);
 
                 if (requestTypes.includes(action.type)) {
                     if (action.isConsecutive) {
@@ -68,21 +67,19 @@ export const createJsonApiReducer = (api, {onPayloadError}) => {
                     return state.setIn([action.entity, 'requests', requestKey], new Map({
                         loading: true,
                         failed: false,
-                        error: null
+                        error: null,
+                        result: new List()
                     }));
                 } else if (successTypes.includes(action.type)) {
+                    const key = [action.entity, 'requests', requestKey];
                     let newState = state;
 
                     if (action.payload.data) {
-                        newState = parseEntities(newState, action.payload.data);
+                        newState = parseEntities(api, options, newState, action.payload.data, key);
                     }
                     if (action.payload.included) {
-                        newState = parseEntities(newState, action.payload.included);
+                        newState = parseEntities(api, options, newState, action.payload.included);
                     }
-
-                    // TODO: add entity ids to result array from payload.data (and possibly payload.included)
-
-                    const key = [action.entity, 'requests', requestKey];
 
                     if (action.isConsecutive) {
                         // TODO: update request information (result, pages)

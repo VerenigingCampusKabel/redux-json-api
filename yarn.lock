@@ -2086,9 +2086,9 @@ rc@~1.1.6:
     minimist "^1.2.0"
     strip-json-comments "~1.0.4"
 
-rdx-api@^2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/rdx-api/-/rdx-api-2.0.5.tgz#5dbffd6695b5335069fd774058b0598e811dfda7"
+rdx-api@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/rdx-api/-/rdx-api-2.0.6.tgz#7a79693a7dffb70736d183c8f6ce194e6ce73849"
   dependencies:
     babel-runtime "^6.9.2"
     humps "^2.0.0"
