@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable';
+import {fromJS, List, Map} from 'immutable';
 import stringify from 'json-stable-stringify';
 import {API_SIGNATURE, InvalidConfigError} from 'rdx-api';
 
@@ -35,9 +35,12 @@ export const createJsonApiReducer = (api, options) => {
 
     // Return the reducer
     return (state = initialState, action) => {
-        // console.log('reducer', util.inspect(action, true, null));
-        if (action.isError) {
-            console.error('error', action.error);
+        // Execute the action handler, if it's present
+        if (options.onAction) {
+            const newState = options.onAction(state, action);
+            if (newState) {
+                return newState;
+            }
         }
 
         // Check if it's an API action and if it's an entity action
@@ -128,11 +131,43 @@ export const createJsonApiReducer = (api, options) => {
 
                 return state;
             }
-            case 'createSingle': {break;}
-            case 'updateSingle': {break;}
-            case 'updateRelationship': {break;}
-            case 'deleteSingle': {break;}
-            case 'deleteRelationship': {break;}
+            case 'createSingle': {
+                return state;
+            }
+            case 'updateSingle': {
+                let newState = state;
+
+                // Update entity attributes
+                const entity = fromJS(action.requestPayload);
+                newState = newState.mergeIn([action.entity, 'entities', entity.get('id'), 'attributes'], entity.get('attributes'));
+
+                // Update relationships set using an attribute
+                // if (relationships[action.entity]) {
+                //     for (const [attr, relation] of Object.entries(relationships[action.entity])) {
+                //         const value = newState.getIn([action.entity, entity.get('id'), 'attributes', attr]);
+                //         if (!value) {
+                //             newState = newState.deleteIn([action.entity, entity.get('id'), 'relationships', relation.key, 'data']);
+                //         } else {
+                //             newState = newState.setIn([action.entity, entity.get('id'), 'relationships', relation.key, 'data'], new Map({
+                //                 id: value,
+                //                 type: relation.type
+                //             }));
+                //         }
+                //     }
+                // }
+
+                return newState;
+            }
+            case 'updateRelationship': {
+                return state;
+            }
+            case 'deleteSingle': {
+                // Delete the entity
+                return state.deleteIn([action.entity, 'entities', action.requestPayload.id]);
+            }
+            case 'deleteRelationship': {
+                return state;
+            }
             default: {
                 return state;
             }
