@@ -7,17 +7,24 @@ import api from './api';
 import rootReducer from './reducers';
 
 console.log(util.inspect(api, false, null));
+console.log();
+
+const logger = (store) => (next) => (action) => {
+    console.log(action.type);
+    const result = next(action);
+    const final = {};
+    Object.entries(store.getState()).forEach(([key, value]) => {
+        final[key] = value && value.toJS ? value.toJS() : value;
+    });
+    console.log(action);
+    console.log(util.inspect(final, false, null));
+    console.log();
+    return result;
+};
 
 const middleware = applyMiddleware(
-    ({getState, dispatch}) => (next) => async (action) => {
-        try {
-            console.log('action', util.inspect(action, true, null));
-            return next(action);
-        } catch (err) {
-            console.error(err);
-        }
-    },
-    createApiMiddleware(api)
+    createApiMiddleware(api),
+    logger
 );
 
 const store = createStore(
