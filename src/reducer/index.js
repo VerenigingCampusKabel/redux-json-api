@@ -56,6 +56,8 @@ export const createJsonApiReducer = (api, options) => {
             return state;
         }
 
+        let newState = state;
+
         switch (action.endpoint) {
             case 'getAll':
             case 'getSingle':
@@ -77,12 +79,12 @@ export const createJsonApiReducer = (api, options) => {
                 if (requestTypes.includes(action.type)) {
                     if (action.isConsecutive) {
                         // Update pages pending and loading lists
-                        return state
+                        return newState
                             .updateIn([...key, 'pagesPending'], (list) => list.delete(list.indexOf(action.page)))
                             .updateIn([...key, 'pagesLoading'], (list) => list.push(action.page));
                     }
 
-                    return state.setIn(key, new Map({
+                    return newState.setIn(key, new Map({
                         loading: true,
                         failed: false,
                         error: null,
@@ -93,8 +95,6 @@ export const createJsonApiReducer = (api, options) => {
                         pagesLoading: new List([1])
                     }));
                 } else if (successTypes.includes(action.type)) {
-                    let newState = state;
-
                     // Store returned entities
                     if (action.payload.data) {
                         newState = parseEntities(api, options, newState, action.payload.data, key);
@@ -129,14 +129,12 @@ export const createJsonApiReducer = (api, options) => {
                     // TODO: handle failure (possibly add pagesFailed)
                 }
 
-                return state;
+                return newState;
             }
             case 'createSingle': {
-                return state;
+                return newState;
             }
             case 'updateSingle': {
-                let newState = state;
-
                 // Update entity attributes
                 const entity = fromJS(action.requestPayload);
                 newState = newState.mergeIn([action.entity, 'entities', entity.get('id'), 'attributes'], entity.get('attributes'));
@@ -159,17 +157,38 @@ export const createJsonApiReducer = (api, options) => {
                 return newState;
             }
             case 'updateRelationship': {
-                return state;
+                const key = [action.entity, action.requestPayload.id, 'relationships', action.requestPayload.relationship, 'data'];
+
+                // Update all entities of the relationship
+                if (Array.isArray(action.requestPayload.data)) {
+                    return newState.setIn(key, fromJS(action.requestPayload.data));
+                }
+
+                // Update the relationship
+                return newState.setIn([...key, 'id'], action.requestPayload.data.id);
             }
             case 'deleteSingle': {
                 // Delete the entity
-                return state.deleteIn([action.entity, 'entities', action.requestPayload.id]);
+                return newState.deleteIn([action.entity, 'entities', action.requestPayload.id]);
             }
             case 'deleteRelationship': {
-                return state;
+                const key = [action.entity, 'entities', action.requestPayload.id, 'relationships', action.requestPayload.relationship, 'data'];
+
+                // Delete all entities of the relationship
+                if (Array.isArray(action.requestPayload.data)) {
+                    const relationship = newState.getIn(key);
+                    for (const entity of action.requestPayload.data) {
+                        const index = relationship.findIndex((e) => e.get('id') === entity.id);
+                        newState = newState.deleteIn([...key, index]);
+                    }
+                    return newState;
+                }
+
+                // Delete the relationship
+                return newState.deleteIn(key);
             }
             default: {
-                return state;
+                return newState;
             }
         }
     };
