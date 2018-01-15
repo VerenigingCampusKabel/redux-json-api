@@ -58,6 +58,8 @@ export const createJsonApiReducer = (api, options) => {
 
         let newState = state;
 
+        // TODO: check if update/delete actions are success and handle failure
+
         switch (action.endpoint) {
             case 'getAll':
             case 'getSingle':
@@ -137,16 +139,17 @@ export const createJsonApiReducer = (api, options) => {
             case 'updateSingle': {
                 // Update entity attributes
                 const entity = fromJS(action.requestPayload);
-                newState = newState.mergeIn([action.entity, 'entities', entity.get('id'), 'attributes'], entity.get('attributes'));
+                const key = [action.entity, 'entities', entity.get('id')];
+                newState = newState.mergeIn([...key, 'attributes'], entity.get('attributes'));
 
                 // Update relationships set using an attribute
                 // if (relationships[action.entity]) {
                 //     for (const [attr, relation] of Object.entries(relationships[action.entity])) {
-                //         const value = newState.getIn([action.entity, entity.get('id'), 'attributes', attr]);
+                //         const value = newState.getIn([...key, 'attributes', attr]);
                 //         if (!value) {
-                //             newState = newState.deleteIn([action.entity, entity.get('id'), 'relationships', relation.key, 'data']);
+                //             newState = newState.deleteIn([...key, 'relationships', relation.key, 'data']);
                 //         } else {
-                //             newState = newState.setIn([action.entity, entity.get('id'), 'relationships', relation.key, 'data'], new Map({
+                //             newState = newState.setIn([...key, 'relationships', relation.key, 'data'], new Map({
                 //                 id: value,
                 //                 type: relation.type
                 //             }));
