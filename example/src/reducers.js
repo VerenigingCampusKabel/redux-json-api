@@ -1,5 +1,5 @@
 import {combineReducers} from 'redux';
-import {createJsonApiReducer} from '../../lib';
+import {createJsonApiReducer} from 'rdx-json-api';
 
 import api from './api';
 

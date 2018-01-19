@@ -3,11 +3,13 @@
     "plugins": [
         "babel",
         "import",
+        "react"
     ],
     "extends": [
         "google",
         "plugin:import/errors",
         "plugin:import/warnings",
+        "plugin:react/recommended"
     ],
     "env": {
         "node": true,
@@ -49,6 +51,7 @@
         "babel/object-curly-spacing": 1,
         "babel/no-invalid-this": 1,
         "import/order": 2,
-        "import/no-unresolved": 0
+        "import/no-unresolved": 0,
+        "react/no-deprecated": 1,
     }
 }

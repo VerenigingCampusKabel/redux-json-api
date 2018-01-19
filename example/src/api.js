@@ -1,4 +1,4 @@
-import {createJsonApi} from '../../lib';
+import {createJsonApi} from 'rdx-json-api';
 
 export default createJsonApi({
     name: 'EXAMPLE_API',
@@ -12,9 +12,7 @@ export default createJsonApi({
             body: true
         }
     },
-    defaults: {
-        credentials: 'include'
-    },
+    defaults: {},
     entities: {
         authors: {
             type: 'authors',
@@ -24,5 +22,6 @@ export default createJsonApi({
             type: 'books',
             url: '/books'
         }
-    }
+    },
+    reducerKey: 'entities'
 });

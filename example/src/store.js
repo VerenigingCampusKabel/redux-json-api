@@ -1,30 +1,26 @@
-import util from 'util';
-
-import {createStore, applyMiddleware} from 'redux';
+import {createStore, compose, applyMiddleware} from 'redux';
 import {createApiMiddleware} from 'rdx-api';
 
 import api from './api';
 import rootReducer from './reducers';
 
-console.log(util.inspect(api, false, null));
-console.log();
+console.log(api);
 
 const logger = (store) => (next) => (action) => {
-    console.log(action.type);
+    console.group(action.type);
     const result = next(action);
     const final = {};
     Object.entries(store.getState()).forEach(([key, value]) => {
         final[key] = value && value.toJS ? value.toJS() : value;
     });
-    console.log(action);
-    console.log(util.inspect(final, false, null));
-    console.log();
+    console.log(action, final);
+    console.groupEnd();
     return result;
 };
 
-const middleware = applyMiddleware(
-    createApiMiddleware(api),
-    logger
+const middleware = compose(
+    applyMiddleware(createApiMiddleware(api)),
+    applyMiddleware(logger)
 );
 
 const store = createStore(

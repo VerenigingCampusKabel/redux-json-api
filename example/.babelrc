@@ -1,0 +1,14 @@
+{
+    "presets": [
+        ["env", {
+            "targets": {
+                "browsers": [">1%"]
+            }
+        }],
+        "stage-0",
+        "react"
+    ],
+    "plugins": [
+        "react-hot-loader/babel"
+    ]
+}
