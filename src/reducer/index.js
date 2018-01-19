@@ -42,7 +42,6 @@ export const createJsonApiReducer = (api, options) => {
                 return newState;
             }
         }
-        console.log(action.signature, API_SIGNATURE);
 
         // Check if it's an API action and if it's an entity action
         if (action.signature !== API_SIGNATURE || !action.isEntity) {
