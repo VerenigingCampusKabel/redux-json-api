@@ -5,12 +5,12 @@ import {getRequestKey, getPageFromUrl} from '../util';
 import {parseEntities} from './entity';
 
 /**
- * Create a Redux reducer for a JSON API.
- *
- * @param {object} api API configuration
- * @param {object} options Reducer options
- * @return {function} The created Redux reducer
- */
+* Create a Redux reducer for a JSON API.
+*
+* @param {object} api API configuration
+* @param {object} options Reducer options
+* @return {function} The created Redux reducer
+*/
 export const createJsonApiReducer = (api, options) => {
     // Validate API configuration
     if (typeof api !== 'object') {
@@ -55,9 +55,18 @@ export const createJsonApiReducer = (api, options) => {
             return state;
         }
 
-        let newState = state;
+        // Determine action type
+        let type = null;
+        if (requestTypes.includes(action.type)) {
+            type = 'request';
+        } else if (successTypes.includes(action.type)) {
+            type = 'success';
+        } else if (failureTypes.includes(action.type)) {
+            type = 'failure';
+        }
 
-        // TODO: check if update/delete actions are success and handle failure
+        // Use the current state as base for the new state
+        let newState = state;
 
         switch (action.endpoint) {
             case 'getAll':
@@ -67,7 +76,7 @@ export const createJsonApiReducer = (api, options) => {
                 const {requestKey, pageQuery} = getRequestKey(action.requestPayload);
                 const key = [action.entity, 'requests', requestKey];
 
-                if (requestTypes.includes(action.type)) {
+                if (type === 'request') {
                     if (action.isConsecutive) {
                         // Update pages pending and loading lists
                         return newState
@@ -75,7 +84,7 @@ export const createJsonApiReducer = (api, options) => {
                             .updateIn([...key, 'pagesLoading'], (list) => list.push(action.page));
                     }
 
-                    return newState.setIn(key, new Map({
+                    newState = newState.setIn(key, new Map({
                         loading: true,
                         failed: false,
                         error: null,
@@ -85,7 +94,7 @@ export const createJsonApiReducer = (api, options) => {
                         pagesPending: new List(),
                         pagesLoading: new List([1])
                     }));
-                } else if (successTypes.includes(action.type)) {
+                } else if (type === 'success') {
                     // Store returned entities
                     if (action.payload.data) {
                         newState = parseEntities(api, options, newState, action.payload.data, key);
@@ -115,69 +124,91 @@ export const createJsonApiReducer = (api, options) => {
                     }
 
                     // Update loading status
-                    return newState.setIn([...key, 'loading'], newState.getIn([...key, 'pagesPending']).size > 1);
-                } else if (failureTypes.includes(action.type)) {
+                    newState = newState.setIn([...key, 'loading'], newState.getIn([...key, 'pagesPending']).size > 1);
+                } else if (type === 'failure') {
                     // TODO: handle failure (possibly add pagesFailed)
                 }
-
                 return newState;
             }
             case 'createSingle': {
+                if (type === 'success') {
+                    // TODO: handle success
+                } else if (type === 'failure') {
+                    // TODO: handle failure
+                }
                 return newState;
             }
             case 'updateSingle': {
-                // Update entity attributes
-                const entity = fromJS(action.requestPayload);
-                const key = [action.entity, 'entities', entity.get('id')];
-                newState = newState.mergeIn([...key, 'attributes'], entity.get('attributes'));
+                if (type === 'success') {
+                    // Update entity attributes
+                    const entity = fromJS(action.requestPayload);
+                    const key = [action.entity, 'entities', entity.get('id')];
+                    newState = newState.mergeIn([...key, 'attributes'], entity.get('attributes'));
 
-                // Update relationships set using an attribute
-                // if (relationships[action.entity]) {
-                //     for (const [attr, relation] of Object.entries(relationships[action.entity])) {
-                //         const value = newState.getIn([...key, 'attributes', attr]);
-                //         if (!value) {
-                //             newState = newState.deleteIn([...key, 'relationships', relation.key, 'data']);
-                //         } else {
-                //             newState = newState.setIn([...key, 'relationships', relation.key, 'data'], new Map({
-                //                 id: value,
-                //                 type: relation.type
-                //             }));
-                //         }
-                //     }
-                // }
-
+                    // Update relationships set using an attribute
+                    // if (relationships[action.entity]) {
+                    //     for (const [attr, relation] of Object.entries(relationships[action.entity])) {
+                    //         const value = newState.getIn([...key, 'attributes', attr]);
+                    //         if (!value) {
+                    //             newState = newState.deleteIn([...key, 'relationships', relation.key, 'data']);
+                    //         } else {
+                    //             newState = newState.setIn([...key, 'relationships', relation.key, 'data'], new Map({
+                    //                 id: value,
+                    //                 type: relation.type
+                    //             }));
+                    //         }
+                    //     }
+                    // }
+                } else if (type === 'failure') {
+                    // TODO: handle failure
+                }
                 return newState;
             }
             case 'updateRelationship': {
-                const key = [action.entity, action.requestPayload.id, 'relationships', action.requestPayload.relationship, 'data'];
+                if (type === 'success') {
+                    const key = [action.entity, action.requestPayload.id, 'relationships', action.requestPayload.relationship, 'data'];
 
-                // Update all entities of the relationship
-                if (Array.isArray(action.requestPayload.data)) {
-                    return newState.setIn(key, fromJS(action.requestPayload.data));
+                    // Update all entities of the relationship
+                    if (Array.isArray(action.requestPayload.data)) {
+                        return newState.setIn(key, fromJS(action.requestPayload.data));
+                    }
+
+                    // Update the relationship
+                    newState = newState.setIn([...key, 'id'], action.requestPayload.data.id);
+                } else if (type === 'failure') {
+                    // TODO: handle failure
                 }
-
-                // Update the relationship
-                return newState.setIn([...key, 'id'], action.requestPayload.data.id);
+                return newState;
             }
             case 'deleteSingle': {
-                // Delete the entity
-                return newState.deleteIn([action.entity, 'entities', action.requestPayload.id]);
+                if (type === 'success') {
+                    // Delete the entity
+                    newState = newState.deleteIn([action.entity, 'entities', action.requestPayload.id]);
+                } else if (type === 'failure') {
+                    // TODO: handle failure
+                }
+                return newState;
             }
             case 'deleteRelationship': {
-                const key = [action.entity, 'entities', action.requestPayload.id, 'relationships', action.requestPayload.relationship, 'data'];
+                if (type === 'success') {
+                    const key = [action.entity, 'entities', action.requestPayload.id, 'relationships', action.requestPayload.relationship, 'data'];
 
-                // Delete all entities of the relationship
-                if (Array.isArray(action.requestPayload.data)) {
-                    const relationship = newState.getIn(key);
-                    for (const entity of action.requestPayload.data) {
-                        const index = relationship.findIndex((e) => e.get('id') === entity.id);
-                        newState = newState.deleteIn([...key, index]);
+                    // Delete all entities of the relationship
+                    if (Array.isArray(action.requestPayload.data)) {
+                        const relationship = newState.getIn(key);
+                        for (const entity of action.requestPayload.data) {
+                            const index = relationship.findIndex((e) => e.get('id') === entity.id);
+                            newState = newState.deleteIn([...key, index]);
+                        }
+                        return newState;
                     }
-                    return newState;
-                }
 
-                // Delete the relationship
-                return newState.deleteIn(key);
+                    // Delete the relationship
+                    newState = newState.deleteIn(key);
+                } else if (type === 'failure') {
+                    // TODO: handle failure
+                }
+                return newState;
             }
             default: {
                 return newState;
