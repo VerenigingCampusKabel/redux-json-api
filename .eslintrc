@@ -26,7 +26,7 @@
         "indent": [2, 4, {
             "SwitchCase": 1
         }],
-        "dot-notation": [2, {"allowPattern": "^[a-z]+(_[a-z]+)+$"}],
+        "dot-notation": 0,
         "radix": [2, "as-needed"],
         "no-undef": 2,
         "no-extra-semi": 0,

@@ -1,9 +1,8 @@
 import {fromJS, List, Map} from 'immutable';
-import stringify from 'json-stable-stringify';
 import {API_SIGNATURE, InvalidConfigError} from 'rdx-api';
 
+import {getRequestKey, getPageFromUrl} from '../util';
 import {parseEntities} from './entity';
-import {getPageFromUrl} from './util';
 
 /**
  * Create a Redux reducer for a JSON API.
@@ -64,18 +63,8 @@ export const createJsonApiReducer = (api, options) => {
             case 'getAll':
             case 'getSingle':
             case 'getRelationship': {
-                // Determine the request key by stripping the page query and stringifying the rest
-                let pageQuery = {};
-                const requestKey = stringify(action.requestPayload || {}, {
-                    replacer: (key, value) => {
-                        if (key === 'query' && value.page) {
-                            const {page, ...query} = value;
-                            pageQuery = page;
-                            return Object.entries(query).length > 0 ? query : undefined;
-                        }
-                        return value;
-                    }
-                });
+                // Determine request key
+                const {requestKey, pageQuery} = getRequestKey(action.requestPayload);
                 const key = [action.entity, 'requests', requestKey];
 
                 if (requestTypes.includes(action.type)) {
