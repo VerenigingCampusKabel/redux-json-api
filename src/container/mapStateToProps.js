@@ -11,9 +11,12 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
                 const {requestKey} = getRequestKey({
                     query: entity.query
                 });
-                final[entity.name] = state[api.reducerKey].getIn([entity.name, 'requests', requestKey]);
+
+                const request = state[api.reducerKey].getIn([entity.name, 'requests', requestKey]);
+                // final[entity.name] = request ? request.toJS() : null;
+                final[entity.name] = request;
                 return final;
-            }),
+            }, {}),
             ...otherProps
         };
     };

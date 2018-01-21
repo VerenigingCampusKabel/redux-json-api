@@ -40,17 +40,27 @@ export const createJsonApiContainer = (WrappedComponent, {
                 const d = data[entity.name];
                 const {getEntities} = actions[entity.name];
 
+                console.log(d, data, actions);
+
                 if (entity.preload) {
-                    if (!d.get('loading') || (d.get('loading') && d.get('pagesPending').size > 0 && d.get('pagesLoading') < maxRequests)) {
-                        getEntities({
-                            query: {
-                                page: {
-                                    number: d.getIn(['pagesPending', 0]),
-                                    size: pageSize
-                                },
-                                ...entity.query
-                            }
-                        });
+                    if (d) {
+                        console.log(d.get('loading'), d.get('pagesPending').size, d.get('pagesLoading').size);
+                    }
+                    if (!d || (d.get('loading') && d.get('pagesPending').size > 0 && d.get('pagesLoading').size < maxRequests)) {
+                        console.log('fetch');
+                        if (!window.unitOnce) {
+                            window.unitOnce = false;
+
+                            getEntities({
+                                query: {
+                                    page: {
+                                        number: d ? d.getIn(['pagesPending', 0]) : 1,
+                                        size: pageSize
+                                    },
+                                    ...entity.query
+                                }
+                            });
+                        }
                     }
                 }
 

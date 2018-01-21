@@ -5,7 +5,7 @@ export const getRequestKey = (payload = {}) => {
     let pageQuery = {};
     const requestKey = stringify(payload, {
         replacer: (key, value) => {
-            if (key === 'query' && value.page) {
+            if (key === 'query' && value && value.page) {
                 const {page, ...query} = value;
                 pageQuery = page;
                 return Object.entries(query).length > 0 ? query : undefined;

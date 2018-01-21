@@ -99,8 +99,9 @@ export const createJsonApi = (config) => {
         }
     });
 
-    // Store entity type lookup map
+    // Store relevant variables
     api.typeToEntity = typeToEntity;
+    api.reducerKey = config.reducerKey;
 
     return api;
 };
