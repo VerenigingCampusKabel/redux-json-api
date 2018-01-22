@@ -45,20 +45,27 @@ export const createJsonApiContainer = (WrappedComponent, {
                 if (entity.preload) {
                     if (d) {
                         console.log(d.get('loading'), d.get('pagesPending').size, d.get('pagesLoading').size);
+                    } else {
+                        console.log('no d for', entity.name);
                     }
-                    if (!d || (d.get('loading') && d.get('pagesPending').size > 0 && d.get('pagesLoading').size < maxRequests)) {
-                        console.log('fetch');
-                        if (!window.unitOnce) {
-                            window.unitOnce = false;
 
+                    // TODO: fix this check for multi page support
+                    if (!d || (d.get('pagesPending').size > 0 && d.get('pagesLoading').size < maxRequests)) {
+                        console.log('fetch');
+                        if (!window.unitOnce || window.unitOnce < 2) {
+                            window.unitOnce = (window.unitOnce || 0) + 1;
+
+                            const page = d ? d.getIn(['pagesPending', 0]) : 1;
                             getEntities({
                                 query: {
                                     page: {
-                                        number: d ? d.getIn(['pagesPending', 0]) : 1,
+                                        number: page,
                                         size: pageSize
                                     },
                                     ...entity.query
-                                }
+                                },
+                                isConsecutive: page > 1,
+                                page: page
                             });
                         }
                     }

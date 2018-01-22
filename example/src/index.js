@@ -5,6 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Root from './Root';
+import './actions';
 // import {authors} from './actions';
 // import store from './store';
 

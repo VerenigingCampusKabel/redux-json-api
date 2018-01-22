@@ -5,6 +5,7 @@ import App from './App';
 
 export default createJsonApiContainer(App, {
     api,
+    pageSize: 1,
     entities: [{
         name: 'authors',
         preload: true,

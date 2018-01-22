@@ -17,4 +17,7 @@ export const getRequestKey = (payload = {}) => {
     return {requestKey, pageQuery};
 };
 
-export const getPageFromUrl = (url) => parseInt((new URL(url)).searchParams.get('page[number]'));
+export const getPageFromUrl = (url) => {
+    const urlObject = new URL(url.startsWith('http') ? url : `http://example.com${url.charAt(0) === '/' ? '' : '/'}${url}`);
+    return parseInt(urlObject.searchParams.get('page[number]'));
+};

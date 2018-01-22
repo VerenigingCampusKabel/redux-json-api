@@ -50,7 +50,7 @@ export default {
     devServer: {
         contentBase: path.join(__dirname, 'public'),
         host: 'localhost',
-        port: 4000,
+        port: process.env.PORT || 4000,
         historyApiFallback: true,
         hot: true
     }
