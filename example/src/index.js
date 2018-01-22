@@ -5,8 +5,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Root from './Root';
-import {authors} from './actions';
-import store from './store';
+// import {authors} from './actions';
+// import store from './store';
 
 // Disable sockjs debug information by overriding the enable debug namespaces
 debug.enable('');
