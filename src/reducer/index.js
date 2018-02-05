@@ -77,11 +77,11 @@ export const createJsonApiReducer = (api, options) => {
                 const key = [action.entity, 'requests', requestKey];
 
                 if (type === 'request') {
-                    if (action.isConsecutive) {
+                    if (pageQuery.number > 1) {
                         // Update pages pending and loading lists
                         return newState
-                            .updateIn([...key, 'pagesPending'], (list) => list.delete(list.indexOf(action.page)))
-                            .updateIn([...key, 'pagesLoading'], (list) => list.push(action.page));
+                            .updateIn([...key, 'pagesPending'], (list) => list.delete(list.indexOf(pageQuery.number)))
+                            .updateIn([...key, 'pagesLoading'], (list) => list.push(pageQuery.number));
                     }
 
                     newState = newState.setIn(key, new Map({

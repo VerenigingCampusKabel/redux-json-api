@@ -40,34 +40,31 @@ export const createJsonApiContainer = (WrappedComponent, {
                 const d = data[entity.name];
                 const {getEntities} = actions[entity.name];
 
-                console.log(d, data, actions);
+                // console.log(d, data, actions);
 
                 if (entity.preload) {
-                    if (d) {
-                        console.log(d.get('loading'), d.get('pagesPending').size, d.get('pagesLoading').size);
-                    } else {
-                        console.log('no d for', entity.name);
-                    }
+                    // if (d) {
+                    //     console.log(d.get('loading'), d.get('pagesPending').size, d.get('pagesLoading').size);
+                    // } else {
+                    //     console.log('no d for', entity.name);
+                    // }
 
-                    // TODO: fix this check for multi page support
                     if (!d || (d.get('pagesPending').size > 0 && d.get('pagesLoading').size < maxRequests)) {
-                        console.log('fetch');
-                        if (!window.unitOnce || window.unitOnce < 2) {
-                            window.unitOnce = (window.unitOnce || 0) + 1;
+                        // console.log('fetch');
+                        // if (!window.unitOnce || window.unitOnce < 4) {
+                        //     window.unitOnce = (window.unitOnce || 0) + 1;
 
-                            const page = d ? d.getIn(['pagesPending', 0]) : 1;
-                            getEntities({
-                                query: {
-                                    page: {
-                                        number: page,
-                                        size: pageSize
-                                    },
-                                    ...entity.query
+                        const page = d ? d.getIn(['pagesPending', 0]) : 1;
+                        getEntities({
+                            query: {
+                                page: {
+                                    number: page,
+                                    size: pageSize
                                 },
-                                isConsecutive: page > 1,
-                                page: page
-                            });
-                        }
+                                ...entity.query
+                            }
+                        });
+                        // }
                     }
                 }
 
