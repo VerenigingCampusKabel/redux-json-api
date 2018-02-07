@@ -34,48 +34,39 @@ export const createJsonApiContainer = (WrappedComponent, {
         static propTypes = propTypes
 
         fetchEntities(props) {
-            const {data, actions} = props;
+            const {requests, actions} = props;
 
             entities.forEach((entity) => {
-                const d = data[entity.name];
+                const d = requests[entity.name];
                 const {getEntities} = actions[entity.name];
 
-                // console.log(d, data, actions);
+                if (entity.type === 'single') {
 
-                if (entity.preload) {
-                    // if (d) {
-                    //     console.log(d.get('loading'), d.get('pagesPending').size, d.get('pagesLoading').size);
-                    // } else {
-                    //     console.log('no d for', entity.name);
-                    // }
-
-                    if (!d || (d.get('pagesPending').size > 0 && d.get('pagesLoading').size < maxRequests)) {
-                        // console.log('fetch');
-                        // if (!window.unitOnce || window.unitOnce < 4) {
-                        //     window.unitOnce = (window.unitOnce || 0) + 1;
-
-                        const page = d ? d.getIn(['pagesPending', 0]) : 1;
-                        getEntities({
-                            query: {
-                                page: {
-                                    number: page,
-                                    size: pageSize
-                                },
-                                ...entity.query
-                            }
-                        });
-                        // }
+                } else if (entity.type === 'many') {
+                    if (entity.preload) {
+                        if (!d || (d.get('pagesPending').size > 0 && d.get('pagesLoading').size < maxRequests)) {
+                            const page = d ? d.getIn(['pagesPending', 0]) : 1;
+                            getEntities({
+                                query: {
+                                    page: {
+                                        number: page,
+                                        size: pageSize
+                                    },
+                                    ...entity.query
+                                }
+                            });
+                        }
                     }
-                }
 
-                // if (entity.preloadId) {
-                //     const preloadId = entity.preloadId(props);
-                //     if (preloadId && !loadingSingle && !entitiesMap.get(preloadId)) {
-                //         getEntity({
-                //             id: preloadId
-                //         });
-                //     }
-                // }
+                    // if (entity.preloadId) {
+                    //     const preloadId = entity.preloadId(props);
+                    //     if (preloadId && !loadingSingle && !entitiesMap.get(preloadId)) {
+                    //         getEntity({
+                    //             id: preloadId
+                    //         });
+                    //     }
+                    // }
+                }
             });
         }
 

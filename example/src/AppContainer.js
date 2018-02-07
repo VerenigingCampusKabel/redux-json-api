@@ -7,12 +7,15 @@ export default createJsonApiContainer(App, {
     api,
     pageSize: 1,
     entities: [{
+        type: 'many',
         name: 'authors',
         preload: true,
         query: {
             include: 'books'
         }
     }, {
-        name: 'books'
+        type: 'many',
+        name: 'books',
+        all: true
     }]
 });

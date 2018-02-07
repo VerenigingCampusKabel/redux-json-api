@@ -7,29 +7,39 @@ export default class App extends Component {
     }
 
     render() {
-        // const {
-        //     data: {
-        //         authors: {entities: authors},
-        //         books: {entities: books}
-        //     }
-        // } = this.props;
-        //
-        // return (
-        //     <div>
-        //         <section>
-        //             <h1>Users</h1>
-        //             <ul>
-        //                 {authors.map((author, index) => <li key={index}>{author.getIn(['attributes', 'name'])}</li>)}
-        //             </ul>
-        //         </section>
-        //         <section>
-        //             <h1>Books</h1>
-        //             <ul>
-        //                 {books.map((book, index) => <li key={index}>{book.getIn(['attributes', 'title'])}</li>)}
-        //             </ul>
-        //         </section>
-        //     </div>
-        // );
-        return <div></div>;
+        const {
+            data: {
+                authors: {loading: loadingAuthors, entities: authors},
+                books: {loading: loadingBooks, entities: books}
+            }
+        } = this.props;
+
+        return (
+            <div>
+                <section>
+                    <h1>Authors</h1>
+                    <ul>
+                        {loadingAuthors && <li><i>Loading...</i></li>}
+                        {authors.map((author, index) => <li key={index}>
+                            {author.getIn(['attributes', 'name'])}
+                            <ul>
+                                {author.getIn(['relationships', 'books', 'data'])
+                                    .map((book) => books.get(book.get('id')))
+                                    .filter((book) => !!book)
+                                    .map((book, index) => <li key={index}>{book.getIn(['attributes', 'title'])}</li>)}
+                            </ul>
+                        </li>)}
+                    </ul>
+                </section>
+                <section>
+                    <h1>Books</h1>
+                    <ul>
+                        {loadingBooks && <li><i>Loading...</i></li>}
+                        {books.map((book, index) => <li key={index}>{book.getIn(['attributes', 'title'])}</li>)}
+                    </ul>
+                </section>
+            </div>
+        );
+        // return <div></div>;
     }
 };

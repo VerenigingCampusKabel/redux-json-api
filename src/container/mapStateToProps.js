@@ -5,20 +5,35 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
     const mapStateToProps = (state, ownProps) => {
         const otherProps = otherMapStateToProps ? otherMapStateToProps(state, ownProps) : {};
 
-        return {
-            data: entities.reduce((final, entity) => {
+        const result = {
+            requests: {},
+            data: {},
+            ...otherProps
+        };
+
+        for (const entity of entities) {
+            if (entity.type === 'single') {
+
+            } else if (entity.type === 'many') {
                 // Determine request key
                 const {requestKey} = getRequestKey({
                     query: entity.query
                 });
 
+                // Get the request object
                 const request = state[api.reducerKey].getIn([entity.name, 'requests', requestKey]);
-                // final[entity.name] = request ? request.toJS() : null;
-                final[entity.name] = request;
-                return final;
-            }, {}),
-            ...otherProps
-        };
+                result.requests[entity.name] = request;
+                result.data[entity.name] = {
+                    loading: request && request.get('loading'),
+                    entities: request || entity.all ? state[api.reducerKey]
+                        .getIn([entity.name, 'entities'])
+                        .filter((_, entityId) => entity.all || request.get('result').includes(entityId))
+                        .valueSeq() : []
+                };
+            }
+        }
+
+        return result;
     };
 
     return mapStateToProps;
