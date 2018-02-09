@@ -21,6 +21,10 @@ export default createJsonApi({
         books: {
             type: 'books',
             url: '/books'
+        },
+        stores: {
+            type: 'stores',
+            url: '/stores'
         }
     },
     reducerKey: 'entities'

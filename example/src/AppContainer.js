@@ -17,5 +17,16 @@ export default createJsonApiContainer(App, {
         type: 'many',
         name: 'books',
         all: true
+    }, {
+        type: 'single',
+        name: 'stores',
+        preload: true,
+        id: () => '2',
+        relationships: {
+            books: {
+                type: 'many',
+                preload: true
+            }
+        }
     }]
 });

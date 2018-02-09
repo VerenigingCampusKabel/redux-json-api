@@ -10,7 +10,10 @@ export default class App extends Component {
         const {
             data: {
                 authors: {loading: loadingAuthors, entities: authors},
-                books: {loading: loadingBooks, entities: books}
+                books: {loading: loadingBooks, entities: books},
+                stores: {loading: loadingStores, entity: store, relationships: {
+                    books: {loading: loadingStoreBooks, entities: storeBooks}
+                }}
             }
         } = this.props;
 
@@ -38,6 +41,16 @@ export default class App extends Component {
                         {books.map((book, index) => <li key={index}>{book.getIn(['attributes', 'title'])}</li>)}
                     </ul>
                 </section>
+                {loadingStores && <section>
+                    <h1>Loading store...</h1>
+                </section>}
+                {!loadingStores && <section>
+                    <h1>Store: {store.getIn(['attributes', 'name'])}</h1>
+                    <ul>
+                        {loadingStoreBooks && <li><i>Loading...</i></li>}
+                        {storeBooks.map((book, index) => <li key={index}>{book.getIn(['attributes', 'title'])}</li>)}
+                    </ul>
+                </section>}
             </div>
         );
         // return <div></div>;
