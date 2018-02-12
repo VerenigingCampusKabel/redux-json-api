@@ -1,7 +1,7 @@
 import {List} from 'immutable';
 import {getRequestKey} from '../util';
 
-export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
+export const createMapStateToProps = (api, entities, otherMapStateToProps, {maxRequests = 3, pageSize = 100}) => {
     // Create state mapper function
     const mapStateToProps = (state, ownProps) => {
         const otherProps = otherMapStateToProps ? otherMapStateToProps(state, ownProps) : {};
@@ -13,7 +13,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
             ...otherProps
         };
 
-        const addRequest = (entityName, action, data, pagination = false, preload = false, pageSize = 10) => {
+        const addRequest = (entityName, action, data, pagination = false, preload = false, pageSize = pageSize, maxRequests = maxRequests) => {
             const {requestKey} = getRequestKey(data);
 
             if (!result.requests[entityName]) {
@@ -23,6 +23,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
                 action,
                 pagination,
                 preload,
+                maxRequests,
                 pageSize: pagination ? pageSize : 1,
                 data,
                 requestKey
@@ -39,7 +40,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
 
                 const request = addRequest(entity.name, 'getEntity', {
                     id
-                }, false, entity.preload);
+                }, false, entity.preload, undefined, entity.maxRequests);
 
                 result.data[entity.name] = {
                     loading: request && request.get('loading'),
@@ -55,7 +56,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
                             id,
                             relationship: relationshipName,
                             query: relationship.query
-                        }, relationship.type === 'many', relationship.preload, relationship.pageSize);
+                        }, relationship.type === 'many', relationship.preload, relationship.pageSize, relationship.maxRequests);
 
                         const data = {
                             loading: request && request.get('loading'),
@@ -77,7 +78,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
             } else if (entity.type === 'many') {
                 const request = addRequest(entity.name, 'getEntities', {
                     query: entity.query
-                }, true, entity.preload, entity.pageSize);
+                }, true, entity.preload, entity.pageSize, entity.maxRequests);
 
                 result.data[entity.name] = {
                     loading: request && request.get('loading'),
