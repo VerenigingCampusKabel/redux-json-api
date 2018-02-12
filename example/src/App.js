@@ -23,7 +23,7 @@ export default class App extends Component {
                     <h1>Authors</h1>
                     <ul>
                         {loadingAuthors && <li><i>Loading...</i></li>}
-                        {authors.map((author, index) => <li key={index}>
+                        {authors && authors.map((author, index) => <li key={index}>
                             {author.getIn(['attributes', 'name'])}
                             <ul>
                                 {author.getIn(['relationships', 'books', 'data'])
@@ -38,17 +38,17 @@ export default class App extends Component {
                     <h1>Books</h1>
                     <ul>
                         {loadingBooks && <li><i>Loading...</i></li>}
-                        {books.map((book, index) => <li key={index}>{book.getIn(['attributes', 'title'])}</li>)}
+                        {books && books.map((book, index) => <li key={index}>{book.getIn(['attributes', 'title'])}</li>)}
                     </ul>
                 </section>
                 {loadingStores && <section>
                     <h1>Loading store...</h1>
                 </section>}
-                {!loadingStores && <section>
+                {!loadingStores && store && <section>
                     <h1>Store: {store.getIn(['attributes', 'name'])}</h1>
                     <ul>
                         {loadingStoreBooks && <li><i>Loading...</i></li>}
-                        {storeBooks.map((book, index) => <li key={index}>{book.getIn(['attributes', 'title'])}</li>)}
+                        {storeBooks && storeBooks.map((book, index) => <li key={index}>{book.getIn(['attributes', 'title'])}</li>)}
                     </ul>
                 </section>}
             </div>

@@ -34,38 +34,32 @@ export const createJsonApiContainer = (WrappedComponent, {
         static propTypes = propTypes
 
         fetchEntities(props) {
-            const {requests, actions} = props;
+            const {requests, requestData, actions} = props;
 
             entities.forEach((entity) => {
-                const d = requests[entity.name];
-                const {getEntities} = actions[entity.name];
+                const a = actions[entity.name];
 
-                if (entity.type === 'single') {
+                for (const request of requests[entity.name]) {
+                    const d = requestData[request.requestKey];
 
-                } else if (entity.type === 'many') {
-                    if (entity.preload) {
+                    if (request.preload) {
                         if (!d || (d.get('pagesPending').size > 0 && d.get('pagesLoading').size < maxRequests)) {
                             const page = d ? d.getIn(['pagesPending', 0]) : 1;
-                            getEntities({
+
+                            a[request.action](request.pagination ? {
+                                ...request.data,
                                 query: {
                                     page: {
                                         number: page,
-                                        size: pageSize
+                                        size: request.pageSize
                                     },
-                                    ...entity.query
-                                }
+                                    ...request.data.query
+                                },
+                            } : {
+                                ...request.data
                             });
                         }
                     }
-
-                    // if (entity.preloadId) {
-                    //     const preloadId = entity.preloadId(props);
-                    //     if (preloadId && !loadingSingle && !entitiesMap.get(preloadId)) {
-                    //         getEntity({
-                    //             id: preloadId
-                    //         });
-                    //     }
-                    // }
                 }
             });
         }

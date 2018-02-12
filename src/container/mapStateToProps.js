@@ -1,3 +1,4 @@
+import {List} from 'immutable';
 import {getRequestKey} from '../util';
 
 export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
@@ -6,59 +7,86 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps) => {
         const otherProps = otherMapStateToProps ? otherMapStateToProps(state, ownProps) : {};
 
         const result = {
-            requests: [],
+            requests: {},
+            requestData: {},
             data: {},
             ...otherProps
         };
 
-        const requests = {};
+        const addRequest = (entityName, action, data, pagination = false, preload = false, pageSize = 10) => {
+            const {requestKey} = getRequestKey(data);
+
+            if (!result.requests[entityName]) {
+                result.requests[entityName] = [];
+            }
+            result.requests[entityName].push({
+                action,
+                pagination,
+                preload,
+                pageSize: pagination ? pageSize : 1,
+                data,
+                requestKey
+            });
+
+            const request = state[api.reducerKey].getIn([entityName, 'requests', requestKey]);
+            result.requestData[requestKey] = request;
+            return request;
+        };
 
         for (const entity of entities) {
             if (entity.type === 'single') {
-                // Determine request key
-                const {requestKey} = getRequestKey({
-                    id: entity.id
-                });
-                requests[entity.name] = [requestKey];
+                const id = typeof entity.id === 'function' ? entity.id(ownProps) : entity.id;
+
+                const request = addRequest(entity.name, 'getEntity', {
+                    id
+                }, false, entity.preload);
+
+                result.data[entity.name] = {
+                    loading: request && request.get('loading'),
+                    entity: request && request.get('result').size >= 1 ? state[api.reducerKey]
+                        .getIn([entity.name, 'entities', request.getIn(['result', 0])]) : null
+                };
 
                 if (entity.relationships) {
+                    result.data[entity.name].relationships = {};
+
                     for (const [relationshipName, relationship] of Object.entries(entity.relationships)) {
-                        // Determine request key
-                        const {requestKey} = getRequestKey({
-                            id: entity.id,
+                        const request = addRequest(entity.name, 'getRelationship', {
+                            id,
                             relationship: relationshipName,
                             query: relationship.query
-                        });
-                        requests[entity.name].push(requestKey);
+                        }, relationship.type === 'many', relationship.preload, relationship.pageSize);
+
+                        const data = {
+                            loading: request && request.get('loading'),
+                        };
+
+                        if (relationship.type === 'single') {
+                            data.entity = request && request.get('result').size >= 1 ? state[api.reducerKey]
+                                .getIn([request.get('resultType'), 'entities', request.getIn(['result', 0])]) : null;
+                        } else {
+                            data.entities = request ? (request.get('result').size >= 1 ? state[api.reducerKey]
+                                .getIn([request.get('resultType'), 'entities'])
+                                .filter((_, entityId) => request.get('result').includes(entityId))
+                                .valueSeq() : new List()) : null;
+                        }
+
+                        result.data[entity.name].relationships[relationshipName] = data;
                     }
                 }
             } else if (entity.type === 'many') {
-                // Determine request key
-                const {requestKey} = getRequestKey({
+                const request = addRequest(entity.name, 'getEntities', {
                     query: entity.query
-                });
-                requests[entity.name] = [requestKey];
+                }, true, entity.preload, entity.pageSize);
+
+                result.data[entity.name] = {
+                    loading: request && request.get('loading'),
+                    entities: request || entity.all ? state[api.reducerKey]
+                        .getIn([entity.name, 'entities'])
+                        .filter((_, entityId) => entity.all || request.get('result').includes(entityId))
+                        .valueSeq() : null
+                };
             }
-        }
-
-        for (const [entityName, requestKey] of Object.entries(requests)) {
-            const entity = {
-                name: entityName,
-                all: false
-            };
-
-            // Get the request object
-            const request = state[api.reducerKey].getIn([entity.name, 'requests', requestKey]);
-            result.requests.push(request);
-
-            // TODO: merge entity lists?
-            result.data[entity.name] = {
-                loading: request && request.get('loading'),
-                entities: request || entity.all ? state[api.reducerKey]
-                    .getIn([entity.name, 'entities'])
-                    .filter((_, entityId) => entity.all || request.get('result').includes(entityId))
-                    .valueSeq() : []
-            };
         }
 
         return result;

@@ -12,6 +12,7 @@ export const createMapDispatchToProps = (api, entities, otherMapDispatchToProps)
                 final[entity.name] = {
                     getEntity: (...args) => dispatch(actions.getSingle(...args)),
                     getEntities: (...args) => dispatch(actions.getAll(...args)),
+                    getRelationship: (...args) => dispatch(actions.getRelationship(...args)),
                     createEntity: (...args) => dispatch(actions.createSingle(...args)),
                     updateEntity: (...args) => dispatch(actions.updateSingle(...args)),
                     updateRelationship: (...args) => dispatch(actions.updateRelationship(...args)),

@@ -104,7 +104,7 @@ export const createJsonApiReducer = (api, options) => {
                     }
 
                     // Update pagination information
-                    if (action.payload.links) {
+                    if (action.payload.links && Array.isArray(action.payload.data)) {
                         // Parse link URLs
                         const last = action.payload.links.last ? getPageFromUrl(action.payload.links.last) : 1;
                         const current = action.payload.links.next ? Math.min(Math.max(1, getPageFromUrl(action.payload.links.next) - 1), last) : last;
