@@ -5,18 +5,19 @@ import App from './App';
 
 export default createJsonApiContainer(App, {
     api,
+    defaultMaxRequests: 3,
+    defaultPageSize: 100,
     entities: [{
         type: 'many',
         name: 'authors',
-        pageSize: 1,
         preload: true,
+        pageSize: 1,
         query: {
             include: 'books'
         }
     }, {
         type: 'many',
         name: 'books',
-        pageSize: 10,
         all: true
     }, {
         type: 'single',
@@ -26,8 +27,8 @@ export default createJsonApiContainer(App, {
         relationships: {
             books: {
                 type: 'many',
-                pageSize: 5,
-                preload: true
+                preload: true,
+                pageSize: 5
             }
         }
     }]
