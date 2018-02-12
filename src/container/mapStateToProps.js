@@ -1,7 +1,7 @@
 import {List} from 'immutable';
 import {getRequestKey} from '../util';
 
-export const createMapStateToProps = (api, entities, otherMapStateToProps, {maxRequests = 3, pageSize = 100}) => {
+export const createMapStateToProps = (api, entities, otherMapStateToProps, {defaultMaxRequests, defaultPageSize}) => {
     // Create state mapper function
     const mapStateToProps = (state, ownProps) => {
         const otherProps = otherMapStateToProps ? otherMapStateToProps(state, ownProps) : {};
@@ -13,7 +13,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {maxR
             ...otherProps
         };
 
-        const addRequest = (entityName, action, data, pagination = false, preload = false, pageSize = pageSize, maxRequests = maxRequests) => {
+        const addRequest = (entityName, action, data, pagination = false, preload = false, pageSize = defaultMaxRequests, maxRequests = defaultPageSize) => {
             const {requestKey} = getRequestKey(data);
 
             if (!result.requests[entityName]) {
@@ -64,10 +64,10 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {maxR
 
                         if (relationship.type === 'single') {
                             data.entity = request && request.get('result').size >= 1 ? state[api.reducerKey]
-                                .getIn([request.get('resultType'), 'entities', request.getIn(['result', 0])]) : null;
+                                .getIn([api.typeToEntity[request.get('resultType')], 'entities', request.getIn(['result', 0])]) : null;
                         } else {
                             data.entities = request ? (request.get('result').size >= 1 ? state[api.reducerKey]
-                                .getIn([request.get('resultType'), 'entities'])
+                                .getIn([api.typeToEntity[request.get('resultType')], 'entities'])
                                 .filter((_, entityId) => request.get('result').includes(entityId))
                                 .valueSeq() : new List()) : null;
                         }

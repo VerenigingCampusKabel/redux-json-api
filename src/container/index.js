@@ -27,8 +27,8 @@ export const createJsonApiContainer = (WrappedComponent, {
 
     // Create state and dispatch mappers
     const mapStateToProps = createMapStateToProps(api, entities, otherMapStateToProps, {
-        maxRequests: defaultMaxRequests,
-        pageSize: defaultPageSize
+        defaultMaxRequests,
+        defaultPageSize
     });
     const mapDispatchToProps = createMapDispatchToProps(api, entities, otherMapDispatchToProps);
 
