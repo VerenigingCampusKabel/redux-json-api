@@ -6,7 +6,6 @@ export const createMapDispatchToProps = (api, entities, otherMapDispatchToProps)
         return {
             actions: entities.reduce((final, entity) => {
                 // Look up entity actions
-                console.log(api.actions);
                 const actions = api.actions.entities[entity.name];
 
                 final[entity.name] = {
