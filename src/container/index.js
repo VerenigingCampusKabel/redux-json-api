@@ -44,19 +44,22 @@ export const createJsonApiContainer = (WrappedComponent, {
 
                 for (const request of requests[entity.name]) {
                     const d = requestData[request.requestKey];
-                    if ((request.preload && !d) || (d && (d.get('pagesPending').size > 0 && d.get('pagesLoading').size < request.maxRequests))) {
-                        const page = d ? d.getIn(['pagesPending', 0]) : 1;
 
-                        a[request.action](request.pagination ? {
-                            ...request.data,
-                            query: {
-                                page: {
-                                    number: page,
-                                    size: request.pageSize
+                    if (request.preload) {
+                        if (!d || (d.get('pagesPending').size > 0 && d.get('pagesLoading').size < request.maxRequests)) {
+                            const page = d ? d.getIn(['pagesPending', 0]) : 1;
+
+                            a[request.action](request.pagination ? {
+                                ...request.data,
+                                query: {
+                                    page: {
+                                        number: page,
+                                        size: request.pageSize
+                                    },
+                                    ...request.data.query
                                 },
-                                ...request.data.query
-                            },
-                        } : request.data);
+                            } : request.data);
+                        }
                     }
                 }
             });
