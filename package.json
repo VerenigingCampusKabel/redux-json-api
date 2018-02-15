@@ -1,7 +1,7 @@
 {
   "name": "rdx-json-api",
   "description": "Redux middleware for calling a JSON API.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "MIT",
   "author": "Vereniging Campus Kabel <info@vck.tv> (https://vck.tv)",
   "contributors": [
