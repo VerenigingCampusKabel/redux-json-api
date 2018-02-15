@@ -25,19 +25,19 @@ export const createJsonApi = (config) => {
         return final;
     }, {});
 
-    // Normalize default entity headers
-    const _defaultEntityHeaders = config.entityEndpointDefaults ? config.entityEndpointDefaults.headers || {} : {};
-    let defaultEntityHeaders = null;
-    if (typeof _defaultEntityHeaders === 'function') {
-        defaultEntityHeaders = (...args) => {
-            const headers = _defaultEntityHeaders(...args);
+    // Normalize default headers
+    const _defaultHeaders = config.defaults ? config.defaults.headers || {} : {};
+    let defaultHeaders = null;
+    if (typeof _defaultHeaders === 'function') {
+        defaultHeaders = (...args) => {
+            const headers = _defaultHeaders(...args);
             headers['Accept'] = 'application/vnd.api+json';
             headers['Content-Type'] = 'application/vnd.api+json';
             return headers;
         };
     } else {
-        defaultEntityHeaders = () => ({
-            ..._defaultEntityHeaders,
+        defaultHeaders = () => ({
+            ..._defaultHeaders,
             Accept: 'application/vnd.api+json',
             'Content-Type': 'application/vnd.api+json'
         });
@@ -51,11 +51,11 @@ export const createJsonApi = (config) => {
             bodyType: 'json',
             ...config.options
         },
-        entities,
-        entityEndpointDefaults: {
-            ...config.entityEndpointDefaults,
-            headers: defaultEntityHeaders
+        defaults: {
+            ...config.defaults,
+            headers: defaultHeaders
         },
+        entities,
         entityEndpoints: {
             getAll: {
                 url: '/',
