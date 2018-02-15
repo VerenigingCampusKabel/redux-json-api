@@ -9,7 +9,7 @@ export const parseEntity = (options, entity) => {
     if (entity.relationships) {
         for (const relationship of Object.keys(entity.relationships)) {
             // Remove "hidden" relationships
-            if (options.removeHiddenrelationships && relationship.startsWith('_')) {
+            if (options.removeHiddenRelationships && relationship.startsWith('_')) {
                 delete entity.relationships[relationship];
             } else {
                 delete entity.relationships[relationship].links;

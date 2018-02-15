@@ -50,7 +50,7 @@ const api = createJsonApi({
 // Create JSON API reducer
 const reducer = createJsonApiReducer(api, {
     // Remove all relationships starting with an underscore
-    removeHiddenrelationships: true,
+    removeHiddenRelationships: true,
 
     // Skip JSON API reducer and set the new state to the returned object if not null
     onAction: (state, action) => null,
