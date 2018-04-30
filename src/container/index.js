@@ -36,11 +36,7 @@ export const createJsonApiContainer = (WrappedComponent, {
     // Create prop merger
     const mergeProps = (stateProps, dispatchProps, ownProps) => {
         // Merge props (default Redux behaviour)
-        const props = {
-            stateProps,
-            dispatchProps,
-            ownProps
-        };
+        const props = Object.assign({}, ownProps, stateProps, dispatchProps);
 
         // Process the props if necessary
         return processProps ? processProps(props) : props;
