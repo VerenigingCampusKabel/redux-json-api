@@ -12,7 +12,8 @@ export const createJsonApiContainer = (WrappedComponent, {
     defaultMaxRequests = 3,
     defaultPageSize = 100,
     mapStateToProps: otherMapStateToProps,
-    mapDispatchToProps: otherMapDispatchToProps
+    mapDispatchToProps: otherMapDispatchToProps,
+    processProps
 }) => {
     // Check if all required arguments were provided
     if (typeof WrappedComponent !== 'function') {
@@ -31,6 +32,19 @@ export const createJsonApiContainer = (WrappedComponent, {
         defaultPageSize
     });
     const mapDispatchToProps = createMapDispatchToProps(api, entities, otherMapDispatchToProps);
+
+    // Create prop merger
+    const mergeProps = (stateProps, dispatchProps, ownProps) => {
+        // Merge props (default Redux behaviour)
+        const props = {
+            stateProps,
+            dispatchProps,
+            ownProps
+        };
+
+        // Process the props if necessary
+        return processProps ? processProps(props) : props;
+    };
 
     // Create the container
     class APIContainer extends Component {
@@ -88,6 +102,7 @@ export const createJsonApiContainer = (WrappedComponent, {
     // Connect the container to Redux
     return connect(
         mapStateToProps,
-        mapDispatchToProps
+        mapDispatchToProps,
+        mergeProps
     )(APIContainer);
 };
