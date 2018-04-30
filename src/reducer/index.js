@@ -124,7 +124,9 @@ export const createJsonApiReducer = (api, options) => {
                     }
 
                     // Update loading status
-                    newState = newState.setIn([...key, 'loading'], newState.getIn([...key, 'pagesPending']).size > 1);
+                    newState = newState.setIn([...key, 'loading'],
+                        newState.getIn([...key, 'pagesPending']).size > 1 || newState.getIn([...key, 'pagesLoading']).size > 1
+                    );
                 } else if (type === 'failure') {
                     // TODO: handle failure (possibly add pagesFailed)
                 }
