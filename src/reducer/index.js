@@ -90,7 +90,7 @@ export const createJsonApiReducer = (api, options) => {
                         error: null,
                         result: new List(),
                         pageSize: pageQuery.size || 100,
-                        pageCount: null,
+                        pageCount: action.pageLimit,
                         pagesPending: new List(),
                         pagesLoading: new List([1])
                     }));

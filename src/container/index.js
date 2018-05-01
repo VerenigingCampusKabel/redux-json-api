@@ -68,7 +68,7 @@ export const createJsonApiContainer = (WrappedComponent, {
                                     },
                                     ...request.data.query
                                 },
-                            } : request.data);
+                            } : request.data, request.extra);
                         }
                     }
                 }
