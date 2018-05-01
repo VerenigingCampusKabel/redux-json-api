@@ -1,7 +1,7 @@
 import {List} from 'immutable';
 import {getRequestKey} from '../util';
 
-export const createMapStateToProps = (api, entities, otherMapStateToProps, {defaultMaxRequests, defaultPageSize}) => {
+export const createMapStateToProps = (api, entities, otherMapStateToProps, {defaultPageSize, defaultPageLimit, defaultMaxRequests}) => {
     // Create state mapper function
     const mapStateToProps = (state, ownProps) => {
         const otherProps = otherMapStateToProps ? otherMapStateToProps(state, ownProps) : {};
@@ -14,7 +14,8 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {defa
         };
 
         const addRequest = (
-            entityName, action, data, pagination = false, preload = false, pageSize = defaultMaxRequests, maxRequests = defaultPageSize, extra
+            entityName, action, data, pagination = false, preload = false,
+            pageSize = defaultPageSize, pageLimit = defaultPageLimit, maxRequests = defaultMaxRequests
         ) => {
             const {requestKey} = getRequestKey(data);
 
@@ -28,9 +29,9 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {defa
                 preload,
                 maxRequests,
                 pageSize: pagination ? pageSize : 1,
+                pageLimit: pageLimit,
                 data,
-                requestKey,
-                extra
+                requestKey
             });
 
             const request = state[api.reducerKey].getIn([entityName, 'requests', requestKey]);
@@ -44,7 +45,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {defa
 
                 const request = addRequest(entity.name, 'getEntity', {
                     id
-                }, false, entity.preload, undefined, entity.maxRequests, entity.extra);
+                }, false, entity.preload, undefined, undefined, entity.maxRequests);
 
                 result.data[entity.name] = {
                     loading: request && request.get('loading'),
@@ -60,7 +61,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {defa
                             id,
                             relationship: relationshipName,
                             query: relationship.query
-                        }, relationship.type === 'many', relationship.preload, relationship.pageSize, relationship.maxRequests, entity.extra);
+                        }, relationship.type === 'many', relationship.preload, relationship.pageSize, relationship.pageLimit, relationship.maxRequests);
 
                         const data = {
                             loading: request && request.get('loading'),
@@ -82,7 +83,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {defa
             } else if (entity.type === 'many') {
                 const request = addRequest(entity.name, 'getEntities', {
                     query: entity.query
-                }, true, entity.preload, entity.pageSize, entity.maxRequests, entity.extra);
+                }, true, entity.preload, entity.pageSize, entity.pageLimit, entity.maxRequests);
 
                 result.data[entity.name] = {
                     loading: request && request.get('loading'),
