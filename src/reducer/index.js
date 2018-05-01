@@ -90,7 +90,7 @@ export const createJsonApiReducer = (api, options) => {
                         error: null,
                         result: new List(),
                         pageSize: pageQuery.size || 100,
-                        pageCount: action.pageLimit,
+                        pageCount: null,
                         pagesPending: new List(),
                         pagesLoading: new List([1])
                     }));
@@ -106,8 +106,13 @@ export const createJsonApiReducer = (api, options) => {
                     // Update pagination information
                     if (action.payload.links && Array.isArray(action.payload.data)) {
                         // Parse link URLs
-                        const last = action.payload.links.last ? getPageFromUrl(action.payload.links.last) : 1;
+                        let last = action.payload.links.last ? getPageFromUrl(action.payload.links.last) : 1;
                         const current = action.payload.links.next ? Math.min(Math.max(1, getPageFromUrl(action.payload.links.next) - 1), last) : last;
+
+                        // Limit pages if required
+                        if (action.pageLimit) {
+                            last = action.pageLimit;
+                        }
 
                         // This is the first page, so update the page count and pages pending list
                         if (!newState.getIn([...key, 'pageCount'])) {
