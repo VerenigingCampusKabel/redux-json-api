@@ -1,4 +1,4 @@
-import {List} from 'immutable';
+import {Map} from 'immutable';
 import {getRequestKey} from '../util';
 
 export const createMapStateToProps = (api, entities, otherMapStateToProps, {defaultPageSize, defaultPageLimit, defaultMaxRequests}) => {
@@ -73,8 +73,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {defa
                         } else {
                             data.entities = request ? (request.get('result').size >= 1 ? state[api.reducerKey]
                                 .getIn([api.typeToEntity[request.get('resultType')], 'entities'])
-                                .filter((_, entityId) => request.get('result').includes(entityId))
-                                .valueSeq() : new List()) : null;
+                                .filter((_, entityId) => request.get('result').includes(entityId)) : new Map()) : null;
                         }
 
                         result.data[entity.name].relationships[relationshipName] = data;
@@ -89,8 +88,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {defa
                     loading: request && request.get('loading'),
                     entities: request || entity.all ? state[api.reducerKey]
                         .getIn([entity.name, 'entities'])
-                        .filter((_, entityId) => entity.all || request.get('result').includes(entityId))
-                        .valueSeq() : null
+                        .filter((_, entityId) => entity.all || request.get('result').includes(entityId)) : null
                 };
             }
         }
