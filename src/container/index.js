@@ -53,7 +53,7 @@ export const createJsonApiContainer = (WrappedComponent, {
                 const a = actions[entity.name];
 
                 for (const request of requests[entity.name]) {
-                    const d = requestData[request.requestKey];
+                    const d = requestData[entity.name][request.requestKey];
 
                     if (request.preload) {
                         if (!d || (d.get('pagesPending').size > 0 && d.get('pagesLoading').size < request.maxRequests)) {

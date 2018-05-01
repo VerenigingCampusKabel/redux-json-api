@@ -18,6 +18,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {defa
 
             if (!result.requests[entityName]) {
                 result.requests[entityName] = [];
+                result.requestData[entityName] = [];
             }
             result.requests[entityName].push({
                 action,
@@ -30,7 +31,7 @@ export const createMapStateToProps = (api, entities, otherMapStateToProps, {defa
             });
 
             const request = state[api.reducerKey].getIn([entityName, 'requests', requestKey]);
-            result.requestData[requestKey] = request;
+            result.requestData[entityName][requestKey] = request;
             return request;
         };
 
