@@ -70,7 +70,9 @@ export const createJsonApiContainer = (WrappedComponent, {
                                     },
                                     ...request.data.query
                                 },
-                            } : request.data, request.extra);
+                            } : request.data, {
+                                pageLimit: request.pageLimit
+                            });
                         }
                     }
                 }
