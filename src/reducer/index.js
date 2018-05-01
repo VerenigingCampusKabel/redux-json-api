@@ -111,7 +111,7 @@ export const createJsonApiReducer = (api, options) => {
 
                         // Limit pages if required
                         if (action.pageLimit) {
-                            last = action.pageLimit;
+                            last = Math.min(last, action.pageLimit);
                         }
 
                         // This is the first page, so update the page count and pages pending list
